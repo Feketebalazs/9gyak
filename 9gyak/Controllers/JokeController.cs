@@ -19,15 +19,29 @@ namespace _9gyak.Controllers
 
         // GET api/<JokeController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public IActionResult Get(int id)
         {
-            return "value";
+            FunnyDatabaseContext context = new FunnyDatabaseContext();
+            var keresettVicc = (from x in context.Jokes
+                                where x.JokeSk == id
+                                select x).FirstOrDefault();
+            if (keresettVicc == null)
+            {
+                return NotFound($"Nincs #{id} azonosítóval vicc");
+            }
+            else
+            {
+                return Ok(keresettVicc);
+            }
         }
 
         // POST api/<JokeController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post([FromBody] Joke újVicc)
         {
+            FunnyDatabaseContext context = new FunnyDatabaseContext();
+            context.Jokes.Add(újVicc);
+            context.SaveChanges();
         }
 
         // PUT api/<JokeController>/5
@@ -38,8 +52,15 @@ namespace _9gyak.Controllers
 
         // DELETE api/<JokeController>/5
         [HttpDelete("{id}")]
+      
         public void Delete(int id)
         {
+            FunnyDatabaseContext context = new FunnyDatabaseContext();
+            var törlendőVicc = (from x in context.Jokes
+                                where x.JokeSk == id
+                                select x).FirstOrDefault();
+            context.Remove(törlendőVicc);
+            context.SaveChanges();
         }
     }
 }
